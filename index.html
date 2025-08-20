@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Field Awareness Trainer</title>
     <style>
         * {
@@ -10,15 +10,17 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
             background-color: #000;
             color: white;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
             overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
         }
         
         .setup-screen {
@@ -51,85 +53,146 @@
         }
         
         h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
+            font-size: 2.2rem;
+            margin-bottom: 15px;
             color: #ffcc00;
-            text-shadow: 0 0 15px rgba(255, 204, 0, 0.7);
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .soccer-icon {
+            font-size: 2.5rem;
         }
         
         .subtitle {
-            font-size: 1.4rem;
-            margin-bottom: 30px;
-            max-width: 800px;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            max-width: 90%;
             opacity: 0.9;
+            padding: 0 10px;
         }
         
         .setup-panel {
             background: rgba(0, 0, 0, 0.7);
             border-radius: 20px;
-            padding: 30px;
+            padding: 25px;
             width: 100%;
-            max-width: 500px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+            max-width: 90%;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+            margin-bottom: 20px;
+            border: 2px solid #4dabf7;
         }
         
         .panel-title {
-            font-size: 2rem;
-            margin-bottom: 25px;
+            font-size: 1.6rem;
+            margin-bottom: 20px;
             color: #4dabf7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         
         .controls {
             display: flex;
             flex-direction: column;
             gap: 25px;
-            margin: 30px 0;
+            margin: 20px 0;
         }
         
         .control-group {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
         }
         
         label {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .input-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid #4dabf7;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        .input-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .input-btn:active {
+            transform: scale(0.95);
         }
         
         input {
-            width: 100%;
-            padding: 15px;
+            width: 80px;
+            padding: 12px;
             font-size: 1.3rem;
             border-radius: 10px;
             border: 2px solid #4dabf7;
             background: rgba(20, 20, 30, 0.9);
             color: white;
             text-align: center;
+            font-weight: bold;
+        }
+        
+        .start-btn-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
         }
         
         button {
             background: linear-gradient(to right, #ff8c00, #ffcc00);
             color: #1a1a2e;
             border: none;
-            padding: 18px 35px;
+            padding: 16px 25px;
             border-radius: 50px;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-            margin: 15px 0;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            margin: 10px 0;
+            width: 100%;
+            max-width: 300px;
         }
         
+        /* Fixed hover effect - no movement */
         button:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            transform: scale(1.02);
         }
         
         button:active {
-            transform: translateY(2px);
+            transform: scale(0.98);
         }
         
         button:disabled {
@@ -140,20 +203,22 @@
         }
         
         .color-name {
-            font-size: 8rem;
+            font-size: 6rem;
             font-weight: bold;
-            text-shadow: 0 0 30px rgba(0,0,0,0.8);
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
             margin-top: 20px;
+            text-align: center;
+            padding: 0 20px;
         }
         
         .status-bar {
             position: absolute;
-            top: 20px;
+            top: 15px;
             left: 0;
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             text-align: center;
-            font-size: 1.4rem;
+            font-size: 1.1rem;
             background: rgba(0, 0, 0, 0.6);
             z-index: 20;
         }
@@ -163,41 +228,81 @@
             bottom: 20px;
             left: 0;
             width: 100%;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1rem;
             background: rgba(0, 0, 0, 0.6);
             z-index: 20;
         }
         
-        .stop-btn {
+        .stop-btn-container {
             position: absolute;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: 90px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
             z-index: 15;
         }
         
-        @media (max-width: 768px) {
+        .stop-btn {
+            padding: 14px 25px;
+            font-size: 1.1rem;
+            max-width: 250px;
+        }
+        
+        .sport-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 15px 0;
+            font-size: 2rem;
+        }
+        
+        @media (min-width: 768px) {
             h1 {
-                font-size: 2.2rem;
+                font-size: 3rem;
             }
             
             .subtitle {
-                font-size: 1.1rem;
+                font-size: 1.4rem;
+                max-width: 800px;
+            }
+            
+            .setup-panel {
+                max-width: 500px;
             }
             
             .panel-title {
-                font-size: 1.6rem;
+                font-size: 2rem;
             }
             
             .color-name {
-                font-size: 5rem;
+                font-size: 8rem;
             }
             
             button {
-                padding: 15px 25px;
+                padding: 18px 35px;
+                font-size: 1.4rem;
+                max-width: 350px;
+            }
+            
+            .stop-btn {
+                padding: 16px 30px;
                 font-size: 1.2rem;
+                max-width: 300px;
+            }
+            
+            .input-btn {
+                width: 55px;
+                height: 55px;
+                font-size: 2.2rem;
+            }
+            
+            input {
+                width: 100px;
+                padding: 14px;
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -205,24 +310,45 @@
 <body>
     <!-- Setup Screen -->
     <div class="setup-screen" id="setupScreen">
-        <h1>Field Awareness Trainer</h1>
-        <p class="subtitle">Train athletes to develop better field scanning and situational awareness</p>
+        <h1>
+            <span class="soccer-icon">⚽</span>
+            Field Awareness Trainer
+            <span class="soccer-icon">⚽</span>
+        </h1>
+        <p class="subtitle">Train soccer & futsal players to develop better field scanning and situational awareness</p>
+        
+        <div class="sport-icons">
+            <span>⚽</span>
+            <span>🥅</span>
+            <span>🏃</span>
+            <span>🔁</span>
+        </div>
         
         <div class="setup-panel">
-            <h2 class="panel-title">Training Setup</h2>
+            <h2 class="panel-title">Training Setup ⚙️</h2>
             
             <div class="controls">
                 <div class="control-group">
-                    <label for="colorCount">Number of Colors (2-6):</label>
-                    <input type="number" id="colorCount" min="2" max="6" value="2">
+                    <label for="colorCount">Number of Colors:</label>
+                    <div class="input-container">
+                        <div class="input-btn" id="colorMinus">➖</div>
+                        <input type="number" id="colorCount" min="2" max="6" value="2">
+                        <div class="input-btn" id="colorPlus">➕</div>
+                    </div>
                 </div>
                 
                 <div class="control-group">
                     <label for="duration">Duration per Color (seconds):</label>
-                    <input type="number" id="duration" min="1" max="10" value="2" step="0.5">
+                    <div class="input-container">
+                        <div class="input-btn" id="durationMinus">➖</div>
+                        <input type="number" id="duration" min="1" max="10" value="1" step="0.5">
+                        <div class="input-btn" id="durationPlus">➕</div>
+                    </div>
                 </div>
                 
-                <button id="startBtn">Start Training</button>
+                <div class="start-btn-container">
+                    <button id="startBtn">Start Training</button>
+                </div>
             </div>
         </div>
         
@@ -235,7 +361,11 @@
     <div class="training-screen" id="trainingScreen">
         <div class="status-bar" id="statusBar">Training in progress...</div>
         <div class="color-name" id="colorName">READY</div>
-        <button class="stop-btn" id="stopBtn">Stop Training</button>
+        
+        <div class="stop-btn-container">
+            <button class="stop-btn" id="stopBtn">Stop Training</button>
+        </div>
+        
         <div class="instructions">
             <p>Athlete: Turn around and identify the color when receiving a pass</p>
         </div>
@@ -252,6 +382,12 @@
         const colorName = document.getElementById('colorName');
         const statusBar = document.getElementById('statusBar');
         
+        // Plus/Minus buttons
+        const colorMinus = document.getElementById('colorMinus');
+        const colorPlus = document.getElementById('colorPlus');
+        const durationMinus = document.getElementById('durationMinus');
+        const durationPlus = document.getElementById('durationPlus');
+        
         // App State
         const colors = [
             { name: 'RED', value: '#e74c3c' },
@@ -266,6 +402,22 @@
         let isRunning = false;
         let selectedColors = [];
         let currentIndex = 0;
+        
+        // Update color count
+        function updateColorCount(delta) {
+            let value = parseInt(colorCountInput.value) + delta;
+            if (value < 2) value = 2;
+            if (value > 6) value = 6;
+            colorCountInput.value = value;
+        }
+        
+        // Update duration
+        function updateDuration(delta) {
+            let value = parseFloat(durationInput.value) + delta;
+            if (value < 0.5) value = 0.5;
+            if (value > 10) value = 10;
+            durationInput.value = value.toFixed(1);
+        }
         
         // Validate inputs
         function validateInputs() {
@@ -344,6 +496,12 @@
         startBtn.addEventListener('click', startTraining);
         stopBtn.addEventListener('click', stopTraining);
         
+        // Plus/Minus button events
+        colorMinus.addEventListener('click', () => updateColorCount(-1));
+        colorPlus.addEventListener('click', () => updateColorCount(1));
+        durationMinus.addEventListener('click', () => updateDuration(-0.5));
+        durationPlus.addEventListener('click', () => updateDuration(0.5));
+        
         // Input validation on change
         colorCountInput.addEventListener('change', () => {
             let value = parseInt(colorCountInput.value);
@@ -356,6 +514,12 @@
             if (value < 0.5) durationInput.value = 0.5;
             if (value > 10) durationInput.value = 10;
         });
+        
+        // Prevent zoom on input focus
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+        }
     </script>
 </body>
 </html>
