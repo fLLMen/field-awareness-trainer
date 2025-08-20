@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Field Awareness Trainer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #000;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .setup-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            z-index: 10;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .training-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #ffcc00;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.7);
+        }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+            max-width: 800px;
+            opacity: 0.9;
+        }
+        
+        .setup-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+        }
+        
+        .panel-title {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            color: #4dabf7;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        label {
+            font-size: 1.3rem;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.3rem;
+            border-radius: 10px;
+            border: 2px solid #4dabf7;
+            background: rgba(20, 20, 30, 0.9);
+            color: white;
+            text-align: center;
+        }
+        
+        button {
+            background: linear-gradient(to right, #ff8c00, #ffcc00);
+            color: #1a1a2e;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 50px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            margin: 15px 0;
+        }
+        
+        button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        button:active {
+            transform: translateY(2px);
+        }
+        
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .color-name {
+            font-size: 8rem;
+            font-weight: bold;
+            text-shadow: 0 0 30px rgba(0,0,0,0.8);
+            margin-top: 20px;
+        }
+        
+        .status-bar {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.4rem;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 20;
+        }
+        
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 20;
+        }
+        
+        .stop-btn {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .panel-title {
+                font-size: 1.6rem;
+            }
+            
+            .color-name {
+                font-size: 5rem;
+            }
+            
+            button {
+                padding: 15px 25px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Setup Screen -->
+    <div class="setup-screen" id="setupScreen">
+        <h1>Field Awareness Trainer</h1>
+        <p class="subtitle">Train athletes to develop better field scanning and situational awareness</p>
+        
+        <div class="setup-panel">
+            <h2 class="panel-title">Training Setup</h2>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label for="colorCount">Number of Colors (2-6):</label>
+                    <input type="number" id="colorCount" min="2" max="6" value="2">
+                </div>
+                
+                <div class="control-group">
+                    <label for="duration">Duration per Color (seconds):</label>
+                    <input type="number" id="duration" min="1" max="10" value="2" step="0.5">
+                </div>
+                
+                <button id="startBtn">Start Training</button>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <p>Set parameters and click "Start Training" to begin</p>
+        </div>
+    </div>
+    
+    <!-- Training Screen -->
+    <div class="training-screen" id="trainingScreen">
+        <div class="status-bar" id="statusBar">Training in progress...</div>
+        <div class="color-name" id="colorName">READY</div>
+        <button class="stop-btn" id="stopBtn">Stop Training</button>
+        <div class="instructions">
+            <p>Athlete: Turn around and identify the color when receiving a pass</p>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const setupScreen = document.getElementById('setupScreen');
+        const trainingScreen = document.getElementById('trainingScreen');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const colorCountInput = document.getElementById('colorCount');
+        const durationInput = document.getElementById('duration');
+        const colorName = document.getElementById('colorName');
+        const statusBar = document.getElementById('statusBar');
+        
+        // App State
+        const colors = [
+            { name: 'RED', value: '#e74c3c' },
+            { name: 'BLUE', value: '#3498db' },
+            { name: 'GREEN', value: '#2ecc71' },
+            { name: 'YELLOW', value: '#f1c40f' },
+            { name: 'PURPLE', value: '#9b59b6' },
+            { name: 'ORANGE', value: '#e67e22' }
+        ];
+        
+        let intervalId = null;
+        let isRunning = false;
+        let selectedColors = [];
+        let currentIndex = 0;
+        
+        // Validate inputs
+        function validateInputs() {
+            const colorCount = parseInt(colorCountInput.value);
+            const duration = parseFloat(durationInput.value);
+            
+            if (isNaN(colorCount) || colorCount < 2 || colorCount > 6) {
+                alert("Please enter a valid number of colors (2-6)");
+                return false;
+            }
+            
+            if (isNaN(duration) || duration < 0.5 || duration > 10) {
+                alert("Please enter a valid duration (0.5-10 seconds)");
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Start training sequence
+        function startTraining() {
+            if (!validateInputs()) return;
+            
+            // Get configuration
+            const colorCount = parseInt(colorCountInput.value);
+            const duration = parseFloat(durationInput.value) * 1000; // Convert to milliseconds
+            
+            // Select colors
+            selectedColors = colors.slice(0, colorCount);
+            
+            // Reset state
+            currentIndex = 0;
+            isRunning = true;
+            
+            // Switch to training screen
+            setupScreen.style.display = 'none';
+            trainingScreen.style.display = 'flex';
+            
+            // Show first color immediately
+            showNextColor();
+            
+            // Start interval for subsequent colors
+            intervalId = setInterval(showNextColor, duration);
+        }
+        
+        // Show next color in sequence
+        function showNextColor() {
+            if (!isRunning) return;
+            
+            // Get current color
+            const color = selectedColors[currentIndex];
+            
+            // Update display
+            document.body.style.backgroundColor = color.value;
+            colorName.textContent = color.name;
+            colorName.style.color = (color.name === 'YELLOW') ? '#333' : 'white';
+            
+            // Move to next color (loop back to start if needed)
+            currentIndex = (currentIndex + 1) % selectedColors.length;
+        }
+        
+        // Stop training sequence
+        function stopTraining() {
+            isRunning = false;
+            clearInterval(intervalId);
+            
+            // Reset display
+            document.body.style.backgroundColor = '#000';
+            
+            // Switch back to setup screen
+            trainingScreen.style.display = 'none';
+            setupScreen.style.display = 'flex';
+        }
+        
+        // Event Listeners
+        startBtn.addEventListener('click', startTraining);
+        stopBtn.addEventListener('click', stopTraining);
+        
+        // Input validation on change
+        colorCountInput.addEventListener('change', () => {
+            let value = parseInt(colorCountInput.value);
+            if (value < 2) colorCountInput.value = 2;
+            if (value > 6) colorCountInput.value = 6;
+        });
+        
+        durationInput.addEventListener('change', () => {
+            let value = parseFloat(durationInput.value);
+            if (value < 0.5) durationInput.value = 0.5;
+            if (value > 10) durationInput.value = 10;
+        });
+    </script>
+</body>
+</html>
