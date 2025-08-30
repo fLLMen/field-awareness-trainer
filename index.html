@@ -185,7 +185,6 @@
             max-width: 280px;
         }
         
-        /* Fixed hover effect - no movement */
         button:hover {
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
             transform: scale(1.02);
@@ -346,6 +345,21 @@
                         <div class="input-btn" id="durationPlus">➕</div>
                     </div>
                 </div>
+
+                <!-- Color Mode Selector (shown only if >2 colors) -->
+                <div class="control-group" id="colorModeGroup" style="display: none;">
+                    <label>Color Sequence Mode:</label>
+                    <div style="display: flex; gap: 20px; margin-top: 5px;">
+                        <label style="font-size: 0.9rem;">
+                            <input type="radio" name="colorMode" value="rotate" checked>
+                            Rotate
+                        </label>
+                        <label style="font-size: 0.9rem;">
+                            <input type="radio" name="colorMode" value="random">
+                            Random
+                        </label>
+                    </div>
+                </div>
                 
                 <div class="start-btn-container">
                     <button id="startBtn">Start Training</button>
@@ -389,6 +403,11 @@
         const durationMinus = document.getElementById('durationMinus');
         const durationPlus = document.getElementById('durationPlus');
         
+        // Color mode selector
+        const colorModeGroup = document.getElementById('colorModeGroup');
+        const colorModeRotate = document.querySelector('input[value="rotate"]');
+        const colorModeRandom = document.querySelector('input[value="random"]');
+        
         // App State
         const colors = [
             { name: 'RED', value: '#e74c3c' },
@@ -410,6 +429,9 @@
             if (value < 2) value = 2;
             if (value > 6) value = 6;
             colorCountInput.value = value;
+
+            // Show mode selector only when more than 2 colors
+            colorModeGroup.style.display = (value > 2) ? 'flex' : 'none';
         }
         
         // Update duration
@@ -442,42 +464,44 @@
         function startTraining() {
             if (!validateInputs()) return;
             
-            // Get configuration
             const colorCount = parseInt(colorCountInput.value);
-            const duration = parseFloat(durationInput.value) * 1000; // Convert to milliseconds
+            const duration = parseFloat(durationInput.value) * 1000; // ms
+            const mode = document.querySelector('input[name="colorMode"]:checked').value;
             
-            // Select colors
             selectedColors = colors.slice(0, colorCount);
-            
-            // Reset state
             currentIndex = 0;
             isRunning = true;
             
-            // Switch to training screen
             setupScreen.style.display = 'none';
             trainingScreen.style.display = 'flex';
             
             // Show first color immediately
-            showNextColor();
+            showNextColor(mode);
             
-            // Start interval for subsequent colors
-            intervalId = setInterval(showNextColor, duration);
+            // Start interval
+            intervalId = setInterval(() => {
+                showNextColor(mode);
+            }, duration);
         }
         
         // Show next color in sequence
-        function showNextColor() {
-            if (!isRunning) return;
+        function showNextColor(mode) {
+            if (!isRunning || selectedColors.length === 0) return;
             
-            // Get current color
-            const color = selectedColors[currentIndex];
+            let color;
+            
+            if (mode === 'random') {
+                const randomIndex = Math.floor(Math.random() * selectedColors.length);
+                color = selectedColors[randomIndex];
+            } else {
+                color = selectedColors[currentIndex];
+                currentIndex = (currentIndex + 1) % selectedColors.length;
+            }
             
             // Update display
             document.body.style.backgroundColor = color.value;
             colorName.textContent = color.name;
             colorName.style.color = (color.name === 'YELLOW') ? '#333' : 'white';
-            
-            // Move to next color (loop back to start if needed)
-            currentIndex = (currentIndex + 1) % selectedColors.length;
         }
         
         // Stop training sequence
@@ -485,10 +509,7 @@
             isRunning = false;
             clearInterval(intervalId);
             
-            // Reset display
             document.body.style.backgroundColor = '#000';
-            
-            // Switch back to setup screen
             trainingScreen.style.display = 'none';
             setupScreen.style.display = 'flex';
         }
@@ -497,7 +518,6 @@
         startBtn.addEventListener('click', startTraining);
         stopBtn.addEventListener('click', stopTraining);
         
-        // Plus/Minus button events
         colorMinus.addEventListener('click', () => updateColorCount(-1));
         colorPlus.addEventListener('click', () => updateColorCount(1));
         durationMinus.addEventListener('click', () => updateDuration(-0.5));
@@ -508,6 +528,7 @@
             let value = parseInt(colorCountInput.value);
             if (value < 2) colorCountInput.value = 2;
             if (value > 6) colorCountInput.value = 6;
+            colorModeGroup.style.display = (value > 2) ? 'flex' : 'none';
         });
         
         durationInput.addEventListener('change', () => {
@@ -516,11 +537,10 @@
             if (value > 10) durationInput.value = 10;
         });
         
-        // Prevent zoom on input focus
-        const viewport = document.querySelector('meta[name="viewport"]');
-        if (viewport) {
-            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-        }
+        // Initial check on load
+        window.addEventListener('load', () => {
+            colorModeGroup.style.display = (parseInt(colorCountInput.value) > 2) ? 'flex' : 'none';
+        });
     </script>
 </body>
 </html>
